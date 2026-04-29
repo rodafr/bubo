@@ -56,6 +56,7 @@ type TestRunStatus struct {
 	// +listMapKey=type
 	// +optional
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+	Promote    bool               `json:"promote"`
 }
 
 // +kubebuilder:object:root=true

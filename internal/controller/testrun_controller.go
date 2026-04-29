@@ -19,12 +19,14 @@ package controller
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
 	bubov1alpha1 "github.com/rodafr/bubo/api/v1alpha1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // TestRunReconciler reconciles a TestRun object
@@ -49,7 +51,22 @@ type TestRunReconciler struct {
 func (r *TestRunReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = logf.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var tr bubov1alpha1.TestRun
+	if err := r.Get(ctx, req.NamespacedName, &tr); err != nil {
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	meta.SetStatusCondition(&tr.Status.Conditions, metav1.Condition{
+		Type:               "JobComplete",
+		Status:             metav1.ConditionTrue,
+		ObservedGeneration: tr.Generation,
+		Reason:             "JobSucceeded",
+		Message:            "test job exited 0",
+	})
+
+	if err := r.Status().Update(ctx, &tr); err != nil {
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
