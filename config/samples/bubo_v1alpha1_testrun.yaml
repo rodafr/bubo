@@ -1,0 +1,9 @@
+apiVersion: bubo.test.rwdf.no/v1alpha1
+kind: TestRun
+metadata:
+  labels:
+    app.kubernetes.io/name: bubo
+    app.kubernetes.io/managed-by: kustomize
+  name: testrun-sample
+spec:
+  # TODO(user): Add fields here
